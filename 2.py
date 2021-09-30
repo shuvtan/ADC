@@ -24,39 +24,25 @@ GPIO.setup(comparator, GPIO.IN)
 
 
 
-def uravno(value):
-    while (value >= 1):
-        a = value
-        i = 0
-        while a>1:
-            a = a/2
-            i = i+1
-
-        signal = bin2dac(i)
-        sleep(0.0001)
-        voltage = value/levels * maxVoltage
+def dac1():
+    value = 0
+    i = 7
+    while (i>=0):
+        v = 2**i
+        bin2dac(value+v)
+        voltage = (v+value)/256*maxVoltage
+        sleep(0.001)
         comparatorValue = GPIO.input(comparator)
         if comparatorValue == 1:
-            print ("Ряд = {:^3} -> {}, output voltage = {:.2f}".format(value,signal, voltage))
-            value = value/2
-            uravno(value)
-        else:
-            print ("Ряд = {:^3} -> {}, output voltage = {:.2f}".format(value,signal, voltage))
-            value = (value/2) + value
-            uravno(value)
-        a = value
-        i = 0
-        while a>1:
-            a = a/2
-            i = i+1
-        return decimal2binary(i)
-        
+            value = value+v
+        i = i-1
+    print ("Ряд = {:^3} -> {}, output voltage = {:.2f}".format(1,value, voltage))
+ 
+
 try:
     while True:
-        n = 128
-        m = uravno(n)
-        print (m)
-         
+        dac1()
+   
         
         
 
@@ -68,3 +54,4 @@ finally:
     GPIO.output(dac, GPIO.LOW)
     GPIO.cleanup(dac)
     print("GPIO cleanup!")
+ 
